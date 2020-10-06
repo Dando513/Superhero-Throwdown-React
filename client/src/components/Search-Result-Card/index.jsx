@@ -18,16 +18,11 @@ import {
 from "mdbreact";
 import "./index.css";
 import { useSpring, animated as a } from 'react-spring';
-
 import UsernameContext from "../../context/usernameContext";
 import HeroContext from "../../context/heroContext";
 import AddHeroModal from "../Modal/index";
 import LoadSpinner from "../LoadSpinner";
-
-const ResultCard = ({character}) => {
-  console.log("(ResultCard) props: ", character);
-  const[moreInfo,setMoreInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+const ResultCard = ({character, moreInfo, results}) => {
   const { username } = useContext(UsernameContext);
   const { heroContext, setHeroContext } = useContext(HeroContext);
   
@@ -37,7 +32,6 @@ const ResultCard = ({character}) => {
     transform: `perspective(600px) rotateX(${flipped ? 180 : 0}deg)`,
     config: { mass: 5, tension: 500, friction: 80 }
   })
-
   // creates the colors in the dropdown menu in our card
   function statBarColor(value) {
     if (value <= 50) {
@@ -50,31 +44,14 @@ const ResultCard = ({character}) => {
       return;
     }
   }
-
-  useEffect(()=>{
-    getMoreInfo(character.name)
-  },[character])
-
-function getMoreInfo(name){
-  API.getMoreInfo(name)
-        .then((res2) => {
-          console.log(res2)
-          res2 && setMoreInfo(res2.data.results);
-          setLoading(false);
-      })
-}
-
-
-moreInfo && console.log(moreInfo)
   // function handleMoreInfo(character) {
   //   console.log({ character });
   //   setHeroContext(character);
   // }
-
   return (
     <MDBView hover zoom>
       
-      <MDBCard style={{ width: "16rem" }} className="m-2">
+      {character && <MDBCard style={{ width: "16rem" }} className="m-2">
         <MDBCardImage
           className="img-thumbnail"
           src={character.img}
@@ -96,24 +73,27 @@ moreInfo && console.log(moreInfo)
           <hr></hr>
           <div className="flipCtn">
           <a.div className="flipDiv" style={{ opacity, transform: transform.interpolate(t => `${t} rotateX(180deg)`)}} onClick={()=>setFlipped(state => !state)} >
-          {loading ? <LoadSpinner/> :
-           <>
-            {moreInfo && <h8>Real Name:</h8>}
+           {moreInfo && <>
+            {moreInfo && <h6>Real Name:</h6>}
             {moreInfo && 
               <MDBCardText className="marginBtm mt-0">
                 {moreInfo.real_name}
               </MDBCardText>
             }
             <hr></hr>
-            {moreInfo && <h8>First Comic:</h8>}
+            {moreInfo && <h6>First Comic:</h6>}
             {moreInfo && 
               <MDBCardText className="marginBtm mt-0">
                 {moreInfo.first_appeared_in_issue.name}
               </MDBCardText>
             }
              <hr></hr>
-           </>
-          }
+           </>}
+           {!moreInfo && 
+              <MDBCardText className="marginBtm mt-0">
+                No More Info Found!
+              </MDBCardText>
+            }
           </a.div>
           <a.div fluid className="flipDiv" style={{ opacity: opacity.interpolate(o => 1 - o), transform }} onClick={()=>setFlipped(state => !state)}>
             <MDBCardText className="marginBtm mt-0">
@@ -224,8 +204,8 @@ moreInfo && console.log(moreInfo)
           </div> */}
           
         </MDBCardBody>
-      </MDBCard>
-    </MDBView>     
+      </MDBCard>}
+    </MDBView>
   );
 };
 export default ResultCard;

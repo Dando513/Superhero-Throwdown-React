@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   MDBMask,
   MDBRow,
@@ -13,7 +13,6 @@ import {
 } from "mdbreact";
 import LoadingSpinner from "../LoadSpinner";
 import "./index.css";
-
 import API from "../../utils/API";
 import ResultCard from "../Search-Result-Card";
 import AuthenticationContext from "../../context/authenticationContext";
@@ -22,32 +21,21 @@ import HeroContext from "../../context/heroContext";
 import HeroChart from "../Chart/index";
 import Counter from "../FightBtnClicker/index";
 import FightPageVillainContext from "../../context/fightPageVillainContext";
-
 function SearchPage(props) {
-  console.log("(SearchPage) props: ", props);
   const [searchName, setSearchName] = useState("");
   const [results, setResults] = useState({
     results: [],
     characters: [],
   });
   const [errorMessage, setErrorMessage] = useState("");
-
   // Sets default state to display content is loading
   const [isLoading, setIsLoading] = useState(false);
-
   const { fightPageVillainContext, setFightPageVillainContext } = useContext(
     FightPageVillainContext
   );
-  console.log("fightPageVillainContext: ", fightPageVillainContext);
-
   const { isAuthenticated } = useContext(AuthenticationContext);
-  console.log("isAuthenticated: ", isAuthenticated);
-
   const { username } = useContext(UsernameContext);
-  console.log("username: ", username);
-
   const { heroContext, setHeroContext } = useContext(HeroContext);
-
   function handleInputChange(event) {
     event.preventDefault();
     setSearchName(event.target.value);
@@ -58,12 +46,10 @@ function SearchPage(props) {
       setFightPageVillainContext(res.data[0]);
     });
   }
-
   // check if there are no keys in our object, meanign we have an empty object
   if (Object.keys(fightPageVillainContext).length === 0) {
     getRandomVillain();
   }
-
   function tierList(value) {
     if (value <= 100) {
       return "F";
@@ -83,14 +69,11 @@ function SearchPage(props) {
       return;
     }
   }
-
   function handleFormSubmit() {
     setIsLoading(true);
-    setHeroContext({});
+    // setHeroContext({});
     API.getSuperhero(searchName)
       .then((res) => {
-        setIsLoading(false);
-        console.log("res: ", res);
         if (res.data.error) {
           setErrorMessage(res.data.error);
         } else {
@@ -104,7 +87,6 @@ function SearchPage(props) {
             parseInt(character.powerstats.power) +
             parseInt(character.powerstats.speed) +
             parseInt(character.powerstats.strength);
-
           return {
             img: character.image.url,
             name: character.name,
@@ -129,19 +111,22 @@ function SearchPage(props) {
             work: character.work,
           };
         });
-        console.log("character: ", character);
-
-        setResults({
-          results: res.data.results,
-          characters: character,
+        Promise.all(character.map(character => API.getMoreInfo(character.name))).then((values) => {
+          console.log(values);
+          setIsLoading(false);
+          setResults({
+            results: res.data.results,
+            characters: character,
+            moreInfo: values.map(value=>{
+              return value.data.results
+            })
+          });
         });
-      })
-
-      .catch(console.error);
+        })
   }
-
-  
-
+  useEffect(()=>{
+    console.log(results);
+  })
   
   return (
     <div>
@@ -208,10 +193,10 @@ function SearchPage(props) {
               <MDBCol className="justify-content-center align-items-center text-center container-fluid">
                 {errorMessage ? (
                   <div className="alert alert-danger">{`${errorMessage}`}</div>
-                ) : results.characters.length ? (
+                ) : results.characters.length > 0 ? (
                   <div className="row justify-content-center align-items-center container-fluid">
                     {results.characters.map((character, i) => (
-                      <ResultCard key={i}character={character} results={results.results}/>
+                      <ResultCard key={i} character={character} moreInfo={results.moreInfo[i]} results={results.results}/>
                     ))}
                   </div>
                 ) : (
