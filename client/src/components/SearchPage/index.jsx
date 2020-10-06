@@ -79,6 +79,7 @@ function SearchPage(props) {
         } else {
           setErrorMessage("");
         }
+        console.log(res.data.results)
         let character = res.data.results.map((character) => {
           const total =
             parseInt(character.powerstats.combat) +

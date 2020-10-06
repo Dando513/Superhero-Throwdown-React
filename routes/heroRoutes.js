@@ -78,4 +78,15 @@ module.exports = (app) => {
       match.length === 0 && res.json("No match found!")
     });
   });
+  app.get("/api/superhero/:hero", (req, res) => {
+
+    axios.get(
+      `https://superheroapi.com/api/${process.env.API_KEY}/search/${req.params.hero}`
+    ).then(superHeroResp=>{
+      console.log(superHeroResp.data)
+      res.json(superHeroResp.data)
+    }).catch(err=>{
+      res.json(err);
+    });
+  });
 };

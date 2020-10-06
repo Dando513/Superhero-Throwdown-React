@@ -44,10 +44,10 @@ const ResultCard = ({character, moreInfo, results}) => {
       return;
     }
   }
-  // function handleMoreInfo(character) {
-  //   console.log({ character });
-  //   setHeroContext(character);
-  // }
+  function handleMoreInfo(character) {
+    console.log({ character });
+    setHeroContext(character);
+  }
   return (
     <MDBView hover zoom>
       
@@ -189,19 +189,19 @@ const ResultCard = ({character, moreInfo, results}) => {
           <div className="row">
             <AddHeroModal character={character} username={username} />
           </div>
-          {/* <div className="row">
+          <div className="row">
             <MDBContainer>
               <MDBBtn
                 className="text-white"
                 color="secondary"
                 size="sm"
-                // onClick={() => setFlipped(state => !state)}
+                onClick={() => getMoreInfo(character => !character)}
                 href="#chart"
               >
                 More Info
               </MDBBtn>
             </MDBContainer>
-          </div> */}
+          </div>
           
         </MDBCardBody>
       </MDBCard>}
