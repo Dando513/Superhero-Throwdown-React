@@ -44,7 +44,7 @@ const ResultCard = ({character, moreInfo, results}) => {
       return;
     }
   }
-  function handleMoreInfo(character) {
+  function getMoreInfo(character) {
     console.log({ character });
     setHeroContext(character);
   }
@@ -195,7 +195,7 @@ const ResultCard = ({character, moreInfo, results}) => {
                 className="text-white"
                 color="secondary"
                 size="sm"
-                onClick={() => getMoreInfo(character => !character)}
+                onClick={() => getMoreInfo(character)}
                 href="#chart"
               >
                 More Info
